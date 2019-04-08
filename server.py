@@ -15,26 +15,30 @@ from openvasreporting import openvasreporting
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="OpenVAS Reporting Server",
-        description="Automatically receive and parse XML reports from finished tasks",
+        prog='OpenVAS Reporting Server',
+        description='Automatically receive and parse XML reports from finished tasks',
         allow_abbrev=True
     )
-    parser.add_argument("-i", "--ip", dest="ip", required=False, default="127.0.0.1",
-                        help="IP this server will listen on")
-    parser.add_argument("-p", "--port", dest="port", required=False, default=8081,
-                        help="Port this server will listen on")
-    parser.add_argument("-f", "--format", dest="format", required=False, default="xlsx",
-                        help="OpenVAS Reporting format to parse the report into")
+    parser.add_argument('-i', '--ip', dest='ip', required=False, default='127.0.0.1',
+                        help='IP this server will listen on')
+    parser.add_argument('-p', '--port', dest='port', required=False, default=8081,
+                        help='Port this server will listen on')
+    parser.add_argument('-f', '--format', dest='format', required=False, default='xlsx',
+                        help='OpenVAS Reporting format to parse the report into')
 
     args = parser.parse_args()
+
+    openvasreporting.check_filetype(args.format)
 
     setup_socket(args.ip, args.port, args.format)
 
 
 def setup_socket(host, port, report_format):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((host, port))
+        s.bind((host, int(port)))
         print('Server started on {}:{}'.format(host, str(port)))
+        print('Will create reports in {} format'.format(report_format))
+
         s.listen(5)
 
         while True:
@@ -72,5 +76,5 @@ def write_to_file(file, data):
         f.write(data)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
